@@ -1,7 +1,7 @@
-# Junk files
+## Junk files
 *.DS_Store
 
-# Compiled files
+## Compiled files
 *.so
 
 ## Compressed files
@@ -17,3 +17,6 @@
 ## Cython-specific
 *.pyc
 *.c
+
+## Unnecessary Data files
+/Weather\ Data\ Skimmer/data/*.csv
