@@ -1,0 +1,19 @@
+# Junk files
+*.DS_Store
+
+# Compiled files
+*.so
+
+## Compressed files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+## Cython-specific
+*.pyc
+*.c
