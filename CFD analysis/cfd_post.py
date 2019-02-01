@@ -27,14 +27,14 @@ def convertFileName(file_name):
   # to information about the flight conditions
   file_name_no_csv = file_name[:file_name.find('.csv')]
   rocket, launch, mach_str, pitch_str, roll_str = file_name_no_csv.split('_')
-  data = {
+  name_data = {
     'rocket': rocket,
     'launch': launch,
     'mach number': convertMachNumber(mach_str),
     'pitch': pitch_str[2:],
     'roll': roll_str[2:]
     }
-  return data
+  return name_data
 
 def getSoundSpeed(temp):
   # calculates the sound speed of air at a given temperature
@@ -51,6 +51,58 @@ def getForceCoefficient(force, density, mach_num, temp, ref_area):
   force_coeff = force/(q * ref_area)
   return force_coeff
 
+def cleanMoments(raw_locations, raw_moments):
+  num_moments = len(raw_locations)
+  location_list = []
+  moment_list = []
+  for i in range(0, num_moments):
+    loc = raw_locations[i]
+    mo = raw_moments[i]
+    location = loc[:loc.find('Moments ')].replace('(', ' ').replace(')', ' ').split(' ')[1:4]
+    location_list.append([np.round(float(point), 3) for point in location])
+    moment = mo.replace('(', ' ').replace(')', ' ').split(' ')[1:4]
+    moment_list.append([np.round(float(val), 3) for val in moment])
+  return num_moments, location_list, moment_list
+
+def processData(csv_data, file_name):
+  global density, temp, a_ref # flow properties
+  # flatten rows into a single list
+  flat_data = [sublist[0] for sublist in csv_data if sublist != []]
+  intermediate = ['(' + item for item in ''.join(flat_data).replace('  ', '').split('(')]
+  drag = intermediate[4]
+  raw_moment_locs = intermediate[16::17]
+  raw_moments = intermediate[20::17]
+  num_moments, moment_locs, moments = cleanMoments(raw_moment_locs, raw_moments)
+  # get the drag vector
+  drag_vec = [np.round(float(component),3) for component in drag.replace('(', '').replace(')', '').split(' ')[0:3]]
+  # get any necessary data from the file name
+  file_info = convertFileName(file_name)
+  # calculate drag coefficients in x,y,z
+  coeff_vec = [np.round(getForceCoefficient(float(component), density, file_info['mach number'], temp, a_ref),3) for component in drag_vec]
+  # calculate total drag and drag coefficient
+  total_drag = np.round(np.linalg.norm(drag_vec), 3)
+  total_coeff = np.round(np.linalg.norm(coeff_vec), 3)
+
+  clean_data = {
+    # Launch and flow conditions
+    'rocket': file_info['rocket'],
+    'launch': file_info['launch'],
+    'mach number': file_info['mach number'],
+    'pitch': file_info['pitch'],
+    'roll': file_info['roll'],
+    # Results - forces
+    'drag': drag_vec,
+    'total drag': total_drag,
+    'coeffs': coeff_vec,
+    'total coeff': total_coeff,
+    # Results - moments
+    'number of moments': num_moments,
+    'moment locations': moment_locs,
+    'moment x locations': [moment[0] for moment in moment_locs],
+    'moments': moments,
+    }
+  return clean_data
+
 
 
 
@@ -58,30 +110,20 @@ def getForceCoefficient(force, density, mach_num, temp, ref_area):
 if __name__ == '__main__':
   # header for the results file
   results = [['Rocket', 'Launch', 'Mach Number', 'Pitch (deg)', 'Roll (deg)',
-              'drag_x (N)',       'drag_y (N)',  'drag_z (N)',  'Total Drag (N)',
-              'C_D_x',            'C_D_y',       'C_D_z',       'Total C_D']]
+              'drag vector (N)',  'Total Drag (N)',
+              'C_D vector',       'Total C_D',
+              'Moment x_locations', 'Moments (Nm)']]
 
   for file_name in [name for name in os.listdir(data_dir) if name.endswith('.csv')]:
     with open(data_dir + file_name, 'r') as data_file:
       reader = csv.reader(data_file)
-      data = [row for row in reader]
-      # flatten rows into a single list
-      flat_data = [sublist[0] for sublist in data if sublist != []]
-      # extract info from file name
-      info = convertFileName(file_name)
-      mach_num = info['mach number']
-      # remove all the data except drag vector
-      drag = ['(' + item for item in ''.join(flat_data).replace('  ', '').split('(')][4]
-      drag_vec = drag.replace('(', '').replace(')', '').split(' ')[0:3]
-      # calculate drag coefficients in x,y,z
-      coeff_vec = [np.round(getForceCoefficient(float(component), density, mach_num, temp, a_ref),3) for component in drag_vec]
-      # calculate total drag and drag coefficient
-      total_drag = np.round(np.linalg.norm(drag_vec), 3)
-      total_coeff = np.round(np.linalg.norm(coeff_vec), 3)
+      # print(reader.line_num)
+      raw_data = [row for row in reader]
+      data = processData(raw_data, file_name)
       # add to results, ready to write to csv
-      file_data = [info['rocket'], info['launch'], mach_num, info['pitch'], info['roll'],
-                  drag_vec[0], drag_vec[1], drag_vec[2], total_drag,
-                  coeff_vec[0], coeff_vec[1], coeff_vec[2], total_coeff]
+      file_data = [data['rocket'], data['launch'], data['mach number'], data['pitch'], data['roll'],
+                  data['drag'], data['total drag'], data['coeffs'], data['total coeff'],
+                  data['moment x locations'], data['moments']]
       results.append(file_data)
     data_file.close()
 
