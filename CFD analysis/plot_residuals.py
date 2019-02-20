@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 #file_name: <rocket>_<launch>_M<number (e.g. 0.15 is 0-15)>_PH<number (deg)>_TH<number (deg)>.csv
 # file_name = '{}_{}_M{}-{}_PH{}_TH{}.csv'.format(rocket_name, launch_name, mach_int, mach_dec, pitch, roll)
 
+# Written by: Hamish Self
+# Date modified: 20/2/2019
+
 # OPTIONS
 #===============================================================================
 residual_dir = './residuals/' # location of .out files
