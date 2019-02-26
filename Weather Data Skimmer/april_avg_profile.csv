@@ -1,4 +1,4 @@
-Pressure (hPa),ICAO Height (m),Temperature (C),Dew Point (C),Wind Direction (degree),Wind Speed (knots)
+Pressure (hPa),ICAO Height (m),Temperature (C),Dew Point (C),Wind Direction (degrees clockwise from true north),Wind Speed (knots)
 994.0,0.0,13.43,7.54,65.11,5.87
 994.0,15.2,13.43,7.54,65.11,5.87
 994.0,30.5,13.43,7.54,65.11,5.87

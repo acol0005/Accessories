@@ -173,7 +173,7 @@ if __name__ == '__main__':
   plt.show()
 
   # WRITE TO A CSV
-  # csv_data = [['Pressure (hPa)', 'ICAO Height (m)', 'Temperature (C)', 'Dew Point (C)', 'Wind Direction (degree)', 'Wind Speed (knots)']]
+  # csv_data = [['Pressure (hPa)', 'ICAO Height (m)', 'Temperature (C)', 'Dew Point (C)', 'Wind Direction (degrees clockwise from true north)', 'Wind Speed (knots)']]
   # row_num = 0
   #
   # while row_num < len(alt_std):

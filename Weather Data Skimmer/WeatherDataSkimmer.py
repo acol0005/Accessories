@@ -31,6 +31,7 @@ def writeCSV(filename, csv_data):
 def getData(location, time, file_name):
   # Get the data from the page
   http = u.PoolManager()
+  # URL for the data from Australian Atmospheric Soundings
   url = 'http://slash.dotat.org/cgi-bin/atmos?raw=1&loc={}&time={}'.format(location, time)
   response = http.request('GET', url)
   content = str(response.data)
@@ -40,7 +41,7 @@ def getData(location, time, file_name):
 
 # RUN THE SCRIPT
 if __name__ == '__main__':
-  location = 95527
+  location = 95527 # MOREE
   # date_list = ['20190111', '20190110', '20190107', '20190106',
   #               '20190104', '20190103', '20190101', '20181230',
   #               '20181228', '20181221', '20181217', '20181216',
@@ -51,11 +52,13 @@ if __name__ == '__main__':
   #                   '20180413', '20180414', '20180415', '20180420',
   #                   '20180422', '20180423', '20180424', '20180427']
 
+  month_str = '04'
+
   for year in range(2002, 2019):
     for day in range(1, 31):
       if day < 10:
         day = '0' + str(day)
-      date = str(year) + '04' + str(day)
+      date = str(year) + month_str + str(day)
       time = date + '000000'
       file_name = '{}-{}.csv'.format(location, date)
       getData(location, time, file_name)
