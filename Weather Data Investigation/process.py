@@ -37,7 +37,7 @@ METRES_TO_FEET = 3.28084
 # print('actual location: ({},{})'.format(WM_LAT, WM_LONG))
 # print('nearest data point: ({},{})'.format(lat[WM_LAT_INDEX], long[WM_LONG_INDEX]))
 
-header_row = ['altitude (m)', 'wind speed (m/s)', 'u component (m/s)', 'v component (m/s)', 'w component (m/s)', 'wind direction (degrees clockwise from true north)']
+header_row = ['altitude (m)', 'wind speed (m/s)', 'u component (m/s East)', 'v component (m/s North)', 'w component (m/s Up)', 'wind direction (degrees clockwise from true north)']
 
 # get the indices of the 5x5 square of data points centered on Westmar
 row_filter = np.array([-2, -1, 0, 1, 2])
