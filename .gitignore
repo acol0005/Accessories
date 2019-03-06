@@ -20,3 +20,6 @@
 
 ## Unnecessary Data files
 /Weather\ Data\ Skimmer/data/*.csv
+/CFD\ analysis/data/*/*.csv
+/CFD\ analysis/residuals/*.out
+/CFD\ analysis/residual plots/*.png
