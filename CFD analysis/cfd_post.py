@@ -2,7 +2,7 @@ import csv
 import numpy as np
 import os
 
-data_dir = './data/'
+data_dir = './data/Athena_v2_Data/'
 results_dir = './results/'
 results_file_name = 'results.csv'
 #angles: 0-5, 7, 11, 15, 20
@@ -85,7 +85,9 @@ def processData(csv_data, file_name):
   intermediate = ['(' + item for item in ''.join(flat_data).replace('  ', '').split('(')]
   drag = intermediate[4]
   raw_moment_locs = intermediate[16::17]
-  raw_moments = intermediate[20::17]
+  raw_moment_locs = [moment for moment in raw_moment_locs if moment.endswith('Moments ')] # clear junk
+  max_ind = 20 + 17*len(raw_moment_locs)
+  raw_moments = intermediate[20:max_ind:17]
   num_moments, moment_locs, moments = cleanMoments(raw_moment_locs, raw_moments)
   # get the drag vector
   drag_vec = [float(force) for force in drag.replace('(', '').replace(')', '').split(' ')[0:3]]
@@ -136,11 +138,16 @@ if __name__ == '__main__':
       # print(reader.line_num)
       raw_data = [row for row in reader]
       data = processData(raw_data, file_name)
-      # add to results, ready to write to csv
-      file_data = [data['rocket'], data['launch'], data['mach number'], data['pitch'], data['roll'],
-                  data['drag'], data['total drag'], data['c_d vec'], data['total c_d'],
-                  data['moment x locations'], data['moments'], data['c_m vecs']]
-      results.append(file_data)
+      if data != -1:
+        print('SUCCESS: {}'.format(file_name))
+        # add to results, ready to write to csv
+        file_data = [data['rocket'], data['launch'], data['mach number'], data['pitch'], data['roll'],
+                    data['drag'], data['total drag'], data['c_d vec'], data['total c_d'],
+                    data['moment x locations'], data['moments'], data['c_m vecs']]
+        results.append(file_data)
+      else:
+        print('FAILED: {}'.format(file_name))
+        continue
     data_file.close()
 
   with open(results_dir + results_file_name, 'w') as results_file:
